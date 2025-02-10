@@ -1,0 +1,29 @@
+<html>
+<head>
+<title>TelegramBotApplication.kt</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #bcbec4;}
+.s1 { color: #bcbec4;}
+.s2 { color: #cf8e6d;}
+.s3 { color: #5f826b; font-style: italic;}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+TelegramBotApplication.kt</font>
+</center></td></tr></table>
+<pre><span class="s0">import org</span><span class="s1">.</span><span class="s0">telegram</span><span class="s1">.</span><span class="s0">telegrambots</span><span class="s1">.</span><span class="s0">meta</span><span class="s1">.</span><span class="s0">TelegramBotsApi</span>
+<span class="s0">import org</span><span class="s1">.</span><span class="s0">telegram</span><span class="s1">.</span><span class="s0">telegrambots</span><span class="s1">.</span><span class="s0">updatesreceivers</span><span class="s1">.</span><span class="s0">DefaultBotSession</span>
+
+<span class="s2">class </span><span class="s0">TelegramBotApplication</span>
+
+<span class="s2">fun </span><span class="s0">main</span><span class="s1">() {</span>
+    <span class="s2">val </span><span class="s0">bot </span><span class="s1">= </span><span class="s0">Bot</span><span class="s1">()</span>
+    <span class="s3">/**  Регистрация телеграмм бота  **/</span>
+    <span class="s0">TelegramBotsApi</span><span class="s1">(</span><span class="s0">DefaultBotSession::</span><span class="s2">class</span><span class="s1">.</span><span class="s0">java</span><span class="s1">).</span><span class="s0">registerBot</span><span class="s1">(</span><span class="s0">bot</span><span class="s1">)</span>
+<span class="s1">}</span></pre>
+</body>
+</html>

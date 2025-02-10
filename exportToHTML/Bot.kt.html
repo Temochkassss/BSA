@@ -1,0 +1,241 @@
+<html>
+<head>
+<title>Bot.kt</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #bcbec4;}
+.s1 { color: #bcbec4;}
+.s2 { color: #7a7e85;}
+.s3 { color: #cf8e6d;}
+.s4 { color: #6aab73;}
+.s5 { color: #2aacb8;}
+.s6 { color: #5f826b; font-style: italic;}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+Bot.kt</font>
+</center></td></tr></table>
+<pre><span class="s0">import Database</span><span class="s1">.</span><span class="s0">Question</span><span class="s1">.</span><span class="s0">CharForQuestionDb</span>
+<span class="s0">import Database</span><span class="s1">.</span><span class="s0">Question</span><span class="s1">.</span><span class="s0">DatabaseQuestionHelper</span>
+<span class="s0">import Database</span><span class="s1">.</span><span class="s0">Quizi</span><span class="s1">.</span><span class="s0">CharForQuiziDb</span>
+<span class="s0">import Database</span><span class="s1">.</span><span class="s0">Quizi</span><span class="s1">.</span><span class="s0">DatabaseQuiziHelper</span>
+<span class="s0">import Methods</span><span class="s1">.</span><span class="s0">Errors</span><span class="s1">.</span><span class="s0">goodBoy</span>
+<span class="s0">import Methods</span><span class="s1">.</span><span class="s0">Errors</span><span class="s1">.</span><span class="s0">mistake</span>
+<span class="s0">import Methods</span><span class="s1">.</span><span class="s0">MediaSender</span><span class="s1">.</span><span class="s0">sendMediaGroup</span>
+<span class="s0">import Methods</span><span class="s1">.</span><span class="s0">MediaSender</span><span class="s1">.</span><span class="s0">sendPhoto</span>
+<span class="s0">import Methods</span><span class="s1">.</span><span class="s0">PollSender</span><span class="s1">.</span><span class="s0">submitPoll</span>
+<span class="s2">//import Methods.PollSender.submitPoll</span>
+<span class="s0">import Methods</span><span class="s1">.</span><span class="s0">TextSender</span><span class="s1">.</span><span class="s0">deleteMessage</span>
+<span class="s0">import Methods</span><span class="s1">.</span><span class="s0">TextSender</span><span class="s1">.</span><span class="s0">sendMessage</span>
+<span class="s0">import org</span><span class="s1">.</span><span class="s0">telegram</span><span class="s1">.</span><span class="s0">telegrambots</span><span class="s1">.</span><span class="s0">bots</span><span class="s1">.</span><span class="s0">TelegramLongPollingBot</span>
+<span class="s0">import org</span><span class="s1">.</span><span class="s0">telegram</span><span class="s1">.</span><span class="s0">telegrambots</span><span class="s1">.</span><span class="s0">meta</span><span class="s1">.</span><span class="s0">api</span><span class="s1">.</span><span class="s0">methods</span><span class="s1">.</span><span class="s0">ParseMode</span>
+<span class="s0">import org</span><span class="s1">.</span><span class="s0">telegram</span><span class="s1">.</span><span class="s0">telegrambots</span><span class="s1">.</span><span class="s0">meta</span><span class="s1">.</span><span class="s0">api</span><span class="s1">.</span><span class="s0">objects</span><span class="s1">.</span><span class="s0">Update</span>
+<span class="s0">import org</span><span class="s1">.</span><span class="s0">telegram</span><span class="s1">.</span><span class="s0">telegrambots</span><span class="s1">.</span><span class="s0">meta</span><span class="s1">.</span><span class="s0">api</span><span class="s1">.</span><span class="s0">objects</span><span class="s1">.</span><span class="s0">User</span>
+<span class="s0">import org</span><span class="s1">.</span><span class="s0">telegram</span><span class="s1">.</span><span class="s0">telegrambots</span><span class="s1">.</span><span class="s0">meta</span><span class="s1">.</span><span class="s0">api</span><span class="s1">.</span><span class="s0">objects</span><span class="s1">.</span><span class="s0">media</span><span class="s1">.</span><span class="s0">InputMedia</span>
+<span class="s0">import org</span><span class="s1">.</span><span class="s0">telegram</span><span class="s1">.</span><span class="s0">telegrambots</span><span class="s1">.</span><span class="s0">meta</span><span class="s1">.</span><span class="s0">api</span><span class="s1">.</span><span class="s0">objects</span><span class="s1">.</span><span class="s0">media</span><span class="s1">.</span><span class="s0">InputMediaPhoto</span>
+<span class="s0">import org</span><span class="s1">.</span><span class="s0">telegram</span><span class="s1">.</span><span class="s0">telegrambots</span><span class="s1">.</span><span class="s0">meta</span><span class="s1">.</span><span class="s0">api</span><span class="s1">.</span><span class="s0">objects</span><span class="s1">.</span><span class="s0">replykeyboard</span><span class="s1">.</span><span class="s0">ReplyKeyboardMarkup</span>
+<span class="s0">import org</span><span class="s1">.</span><span class="s0">telegram</span><span class="s1">.</span><span class="s0">telegrambots</span><span class="s1">.</span><span class="s0">meta</span><span class="s1">.</span><span class="s0">api</span><span class="s1">.</span><span class="s0">objects</span><span class="s1">.</span><span class="s0">replykeyboard</span><span class="s1">.</span><span class="s0">buttons</span><span class="s1">.</span><span class="s0">KeyboardButton</span>
+<span class="s0">import org</span><span class="s1">.</span><span class="s0">telegram</span><span class="s1">.</span><span class="s0">telegrambots</span><span class="s1">.</span><span class="s0">meta</span><span class="s1">.</span><span class="s0">api</span><span class="s1">.</span><span class="s0">objects</span><span class="s1">.</span><span class="s0">replykeyboard</span><span class="s1">.</span><span class="s0">buttons</span><span class="s1">.</span><span class="s0">KeyboardRow</span>
+<span class="s0">import java</span><span class="s1">.</span><span class="s0">util</span><span class="s1">.</span><span class="s0">Timer</span>
+<span class="s0">import kotlin</span><span class="s1">.</span><span class="s0">concurrent</span><span class="s1">.</span><span class="s0">schedule</span>
+
+<span class="s3">class </span><span class="s0">Bot: TelegramLongPollingBot</span><span class="s1">(</span><span class="s4">&quot;7110164125:AAFTEP0jd9-peZJDWU6hkQ7v_7qMSZWh7ZU&quot;</span><span class="s1">) {</span>
+    <span class="s0">override </span><span class="s3">fun </span><span class="s0">getBotUsername</span><span class="s1">()</span><span class="s0">: String </span><span class="s1">= </span><span class="s4">&quot;and_she_will_ask_bot&quot;</span>
+
+    <span class="s0">override </span><span class="s3">fun </span><span class="s0">onUpdateReceived</span><span class="s1">(</span><span class="s0">update: Update</span><span class="s1">) {</span>
+
+        <span class="s3">val </span><span class="s0">dbQuiziHelper </span><span class="s1">= </span><span class="s0">DatabaseQuiziHelper</span><span class="s1">(</span><span class="s0">CharForQuiziDb</span><span class="s1">.</span><span class="s0">DATABASE_NAME</span><span class="s1">) </span><span class="s2">// экземпляр класса с функуиями работы над бд</span>
+        <span class="s3">val </span><span class="s0">dbQuestionHelper </span><span class="s1">= </span><span class="s0">DatabaseQuestionHelper</span><span class="s1">(</span><span class="s0">CharForQuestionDb</span><span class="s1">.</span><span class="s0">DATABASE_NAME</span><span class="s1">)</span>
+
+
+
+        <span class="s3">if </span><span class="s1">(</span><span class="s0">update</span><span class="s1">.</span><span class="s0">hasMessage</span><span class="s1">() &amp;&amp; </span><span class="s0">update</span><span class="s1">.</span><span class="s0">message</span><span class="s1">.</span><span class="s0">hasText</span><span class="s1">()) {</span>
+
+            <span class="s3">val </span><span class="s0">messageText </span><span class="s1">= </span><span class="s0">update</span><span class="s1">.</span><span class="s0">message</span><span class="s1">.</span><span class="s0">text</span>
+            <span class="s3">val </span><span class="s0">userChatId </span><span class="s1">= </span><span class="s0">update</span><span class="s1">.</span><span class="s0">message</span><span class="s1">.</span><span class="s0">chatId</span>
+            <span class="s3">val </span><span class="s0">user: User? </span><span class="s1">= </span><span class="s0">update</span><span class="s1">.</span><span class="s0">message</span><span class="s1">.</span><span class="s0">from</span>
+
+            <span class="s3">when </span><span class="s1">(</span><span class="s0">messageText</span><span class="s1">) {</span>
+                <span class="s4">&quot;/start&quot; </span><span class="s1">-&gt; { </span><span class="s2">//создаём стартовое меню (а именно клавиатуру)</span>
+
+                    <span class="s0">dbQuiziHelper</span><span class="s1">.</span><span class="s0">connectToQuziDb</span><span class="s1">()</span>
+                    <span class="s0">dbQuiziHelper</span><span class="s1">.</span><span class="s0">createQuiziTable</span><span class="s1">()</span>
+
+                    <span class="s0">dbQuestionHelper</span><span class="s1">.</span><span class="s0">connectToQuestionDb</span><span class="s1">()</span>
+                    <span class="s0">dbQuestionHelper</span><span class="s1">.</span><span class="s0">createQuiziTable</span><span class="s1">()</span>
+
+                    <span class="s3">val </span><span class="s0">isPremium: Boolean </span><span class="s1">= !(</span><span class="s0">user?</span><span class="s1">.</span><span class="s0">isPremium </span><span class="s1">== </span><span class="s3">false </span><span class="s1">|| </span><span class="s0">user?</span><span class="s1">.</span><span class="s0">isPremium </span><span class="s1">== </span><span class="s3">null</span><span class="s1">)</span>
+                    <span class="s3">val </span><span class="s0">isBot: Boolean </span><span class="s1">= !(</span><span class="s0">user?</span><span class="s1">.</span><span class="s0">isBot </span><span class="s1">== </span><span class="s3">false </span><span class="s1">|| </span><span class="s0">user?</span><span class="s1">.</span><span class="s0">isBot </span><span class="s1">== </span><span class="s3">null</span><span class="s1">)</span>
+                    <span class="s2">// две идентичные записи</span>
+                    <span class="s2">// val isBot: Boolean = if (user?.isBot == false || user?.isBot == null) false else true</span>
+                    <span class="s0">dbQuiziHelper</span><span class="s1">.</span><span class="s0">insertUserToQuiziDb</span><span class="s1">(</span>
+                            <span class="s0">userChatId</span><span class="s1">,</span>
+                            <span class="s4">&quot;</span><span class="s3">${</span><span class="s0">user?</span><span class="s1">.</span><span class="s0">userName</span><span class="s3">}</span><span class="s4">&quot;</span><span class="s1">,</span>
+                            <span class="s4">&quot;</span><span class="s3">${</span><span class="s0">user?</span><span class="s1">.</span><span class="s0">firstName</span><span class="s3">}</span><span class="s4">&quot;</span><span class="s1">,</span>
+                            <span class="s4">&quot;</span><span class="s3">${</span><span class="s0">user?</span><span class="s1">.</span><span class="s0">languageCode</span><span class="s3">}</span><span class="s4">&quot;</span><span class="s1">,</span>
+                            <span class="s0">isPremium</span><span class="s1">,</span>
+                            <span class="s0">isBot</span>
+                    <span class="s1">)</span>
+
+                    <span class="s3">val </span><span class="s0">keyboard </span><span class="s1">= </span><span class="s0">ReplyKeyboardMarkup</span><span class="s1">().</span><span class="s0">apply </span><span class="s1">{</span>
+                        <span class="s0">keyboard </span><span class="s1">= </span><span class="s0">listOf</span><span class="s1">(</span>
+                            <span class="s0">KeyboardRow</span><span class="s1">().</span><span class="s0">apply </span><span class="s1">{</span>
+                                <span class="s0">add</span><span class="s1">(</span><span class="s0">KeyboardButton</span><span class="s1">(</span><span class="s4">&quot;Создать тест&quot;</span><span class="s1">))</span>
+                            <span class="s1">},</span>
+                            <span class="s0">KeyboardRow</span><span class="s1">().</span><span class="s0">apply </span><span class="s1">{</span>
+                                <span class="s0">add</span><span class="s1">(</span><span class="s0">KeyboardButton</span><span class="s1">(</span><span class="s4">&quot;Пройти тест&quot;</span><span class="s1">))</span>
+                            <span class="s1">},</span>
+                            <span class="s0">KeyboardRow</span><span class="s1">().</span><span class="s0">apply </span><span class="s1">{</span>
+                                <span class="s0">add</span><span class="s1">(</span><span class="s0">KeyboardButton</span><span class="s1">(</span><span class="s4">&quot;Узнать успехи&quot;</span><span class="s1">))</span>
+                            <span class="s1">},</span>
+                            <span class="s0">KeyboardRow</span><span class="s1">().</span><span class="s0">apply </span><span class="s1">{</span>
+                                <span class="s0">add</span><span class="s1">(</span><span class="s0">KeyboardButton</span><span class="s1">(</span><span class="s4">&quot;Оценить&quot;</span><span class="s1">))</span>
+                                <span class="s0">add</span><span class="s1">(</span><span class="s0">KeyboardButton</span><span class="s1">(</span><span class="s4">&quot;Отблагодарить&quot;</span><span class="s1">))</span>
+                            <span class="s1">}</span>
+                        <span class="s1">)</span>
+                        <span class="s0">resizeKeyboard </span><span class="s1">= </span><span class="s3">true</span>
+                        <span class="s0">oneTimeKeyboard </span><span class="s1">= </span><span class="s3">true</span>
+<span class="s2">//                        this.isPersistent = true // обязательно отображает созданную клавиатуру, если обычная скрыта</span>
+                    <span class="s1">}</span>
+
+                    <span class="s3">val </span><span class="s0">helloMessage </span><span class="s1">= </span><span class="s0">StringForBot</span><span class="s1">.</span><span class="s0">HELLO_MESSAGE</span>
+                    <span class="s0">sendMessage</span><span class="s1">(</span>
+                        <span class="s3">this</span><span class="s1">,</span>
+                        <span class="s0">userChatId</span><span class="s1">,</span>
+                        <span class="s0">helloMessage</span><span class="s1">,</span>
+                        <span class="s0">replyKeyboard </span><span class="s1">= </span><span class="s0">keyboard</span><span class="s1">,</span>
+                        <span class="s0">parseMode </span><span class="s1">= </span><span class="s0">ParseMode</span><span class="s1">.</span><span class="s0">HTML</span>
+                    <span class="s1">)</span>
+                <span class="s1">}</span>
+
+                <span class="s4">&quot;Создать тест&quot; </span><span class="s1">-&gt; {</span>
+                    <span class="s2">// TODO: (Создание/выбор теста)</span>
+
+                    <span class="s3">val </span><span class="s0">arrayOfAnswers </span><span class="s1">= </span><span class="s0">listOf</span><span class="s1">(</span><span class="s4">&quot;Синий&quot;</span><span class="s1">, </span><span class="s4">&quot;Зеленый&quot;</span><span class="s1">, </span><span class="s4">&quot;Коричневый&quot;</span><span class="s1">, </span><span class="s4">&quot;Серый&quot;</span><span class="s1">)</span>
+                    <span class="s3">val </span><span class="s0">indexOfRightAnswer </span><span class="s1">= </span><span class="s5">1 </span><span class="s2">// Индекс правильного ответа (в данном случае &quot;Зеленый&quot;)</span>
+
+                    <span class="s0">dbQuestionHelper</span><span class="s1">.</span><span class="s0">insertQuestionToQuestionDb</span><span class="s1">(</span>
+                        <span class="s4">&quot;Блок 1&quot;</span><span class="s1">,</span>
+                        <span class="s4">&quot;Какого цвета глаза у твоего партнера?&quot;</span><span class="s1">,</span>
+                        <span class="s0">arrayOfAnswers</span><span class="s1">,</span>
+                        <span class="s0">indexOfRightAnswer</span><span class="s1">,</span>
+                        <span class="s5">10293983</span>
+                    <span class="s1">)</span>
+<span class="s2">//                    mistake(this, userChatId)</span>
+
+                    <span class="s2">// очищаем чат после функционально значимого слова &quot;Создать тест&quot;</span>
+                    <span class="s0">deleteMessage</span><span class="s1">(</span><span class="s3">this</span><span class="s1">, </span><span class="s0">userChatId</span><span class="s1">, </span><span class="s0">update</span><span class="s1">.</span><span class="s0">message</span><span class="s1">.</span><span class="s0">messageId</span><span class="s1">,  </span><span class="s5">5000</span><span class="s1">)</span>
+                <span class="s1">}</span>
+
+                <span class="s4">&quot;Пройти тест&quot; </span><span class="s1">-&gt; {</span>
+                    <span class="s2">// TODO: (Прохождение теста, айудентификации)</span>
+
+                    <span class="s3">val </span><span class="s0">poll </span><span class="s1">= </span><span class="s0">submitPoll</span><span class="s1">(</span>
+                        <span class="s3">this</span><span class="s1">,</span>
+                        <span class="s0">userChatId</span><span class="s1">,</span>
+                        <span class="s0">question </span><span class="s1">= </span><span class="s4">&quot;Java or Kotlin?&quot;</span><span class="s1">,</span>
+                        <span class="s0">options </span><span class="s1">= </span><span class="s0">listOf</span><span class="s1">(</span><span class="s4">&quot;Java&quot;</span><span class="s1">, </span><span class="s4">&quot;Kotlin&quot;</span><span class="s1">),</span>
+                        <span class="s0">type </span><span class="s1">= </span><span class="s4">&quot;quiz&quot;</span><span class="s1">,</span>
+                        <span class="s0">correctAnswerId </span><span class="s1">= </span><span class="s5">1</span><span class="s1">,</span>
+                        <span class="s0">explanation </span><span class="s1">= </span><span class="s4">&quot;Люблю котлетки </span><span class="s3">\uD83E\uDD2B</span><span class="s4">&quot;</span><span class="s1">,</span>
+                        <span class="s0">openPeriod </span><span class="s1">= </span><span class="s5">10</span><span class="s1">, </span><span class="s2">// время на ответ составит 10 секунд</span>
+                    <span class="s1">)</span>
+                    <span class="s0">poll?</span><span class="s1">.</span><span class="s0">let </span><span class="s1">{ </span><span class="s0">deleteMessage</span><span class="s1">(</span><span class="s3">this</span><span class="s1">, </span><span class="s0">userChatId</span><span class="s1">, </span><span class="s0">poll</span><span class="s1">.</span><span class="s0">messageId</span><span class="s1">, </span><span class="s5">10</span><span class="s1">) }</span>
+
+<span class="s2">//                    val poll2 = submitPoll(</span>
+<span class="s2">//                        this,</span>
+<span class="s2">//                        userChatId,</span>
+<span class="s2">//                        question = &quot;Изменил бы ей, если бы это было нужно для спасения её жизни?&quot;,</span>
+<span class="s2">//                        options = listOf(&quot;Да&quot;, &quot;Нет&quot;),</span>
+<span class="s2">//                        type = &quot;regular&quot;,</span>
+<span class="s2">//                    )</span>
+
+                    <span class="s2">// очищаем чат после функционально значимого слова &quot;Пройти тест&quot;</span>
+                    <span class="s0">deleteMessage</span><span class="s1">(</span><span class="s3">this</span><span class="s1">, </span><span class="s0">userChatId</span><span class="s1">, </span><span class="s0">update</span><span class="s1">.</span><span class="s0">message</span><span class="s1">.</span><span class="s0">messageId</span><span class="s1">, </span><span class="s0">delay </span><span class="s1">= </span><span class="s5">5000</span><span class="s1">)</span>
+                <span class="s1">}</span>
+
+                <span class="s4">&quot;Узнать успехи&quot; </span><span class="s1">-&gt; {</span>
+                    <span class="s2">// TODO: (Сбор статистики использования бота)</span>
+
+                    <span class="s0">dbQuestionHelper</span><span class="s1">.</span><span class="s0">readQuestionFromQuestionDb</span><span class="s1">()</span>
+
+                    <span class="s2">// очищаем чат после функционально значимого слова &quot;Узнать успехи&quot;</span>
+                    <span class="s0">deleteMessage</span><span class="s1">(</span><span class="s3">this</span><span class="s1">, </span><span class="s0">userChatId</span><span class="s1">, </span><span class="s0">update</span><span class="s1">.</span><span class="s0">message</span><span class="s1">.</span><span class="s0">messageId</span><span class="s1">, </span><span class="s0">delay </span><span class="s1">= </span><span class="s5">5000</span><span class="s1">)</span>
+
+                <span class="s1">}</span>
+
+                <span class="s4">&quot;Оценить&quot; </span><span class="s1">-&gt; {</span>
+                    <span class="s2">// TODO: (Отправка медиа группы файлов)</span>
+
+                    <span class="s3">val </span><span class="s0">mediaGroup </span><span class="s1">= </span><span class="s0">mutableListOf</span><span class="s1">&lt;</span><span class="s0">InputMedia</span><span class="s1">&gt;().</span><span class="s0">apply </span><span class="s1">{</span>
+                        <span class="s0">add</span><span class="s1">(</span><span class="s0">InputMediaPhoto</span><span class="s1">(</span><span class="s4">&quot;https://avatars.mds.yandex.net/i?id=e0d0272b0183d82415a903f1fabf57f550a9a8d1-9137660-images-thumbs&amp;n=13&quot;</span><span class="s1">))</span>
+                        <span class="s0">add</span><span class="s1">(</span><span class="s0">InputMediaPhoto</span><span class="s1">(</span><span class="s4">&quot;https://avatars.mds.yandex.net/i?id=e0d0272b0183d82415a903f1fabf57f550a9a8d1-9137660-images-thumbs&amp;n=13&quot;</span><span class="s1">))</span>
+                        <span class="s2">//  НЕ ПОЛУЧЕТСЯ ДОБАВИТЬ ВИДЕО К ГРУППЕ</span>
+                        <span class="s2">//  ЧТО НА СЧЁТ ЛОКАЛЬНОЙ ЗАГРУЗКИ ????????? - Шыш, почему то работает только ссылочная привязка файлов</span>
+<span class="s2">//                        add(InputMediaVideo(&quot;https://www.youtube.com/shorts/9J-FhDxrn70?feature=share&quot;))</span>
+                    <span class="s1">}</span>
+
+                    <span class="s0">sendMediaGroup</span><span class="s1">(</span><span class="s3">this</span><span class="s1">, </span><span class="s0">userChatId</span><span class="s1">, </span><span class="s0">mediaGroup</span><span class="s1">)</span>
+
+                    <span class="s2">// очищаем чат после функционально значимого слова &quot;Оценить&quot;</span>
+                    <span class="s0">deleteMessage</span><span class="s1">(</span><span class="s3">this</span><span class="s1">, </span><span class="s0">userChatId</span><span class="s1">, </span><span class="s0">update</span><span class="s1">.</span><span class="s0">message</span><span class="s1">.</span><span class="s0">messageId</span><span class="s1">, </span><span class="s0">delay </span><span class="s1">= </span><span class="s5">5000</span><span class="s1">)</span>
+                <span class="s1">}</span>
+
+                <span class="s4">&quot;Отблагодарить&quot; </span><span class="s1">-&gt; {</span>
+                    <span class="s2">// TODO: (Отправка реквизитов/системы оплаты)</span>
+                    <span class="s0">goodBoy</span><span class="s1">(</span><span class="s3">this</span><span class="s1">, </span><span class="s0">userChatId</span><span class="s1">)</span>
+
+                    <span class="s2">// очищаем чат после функционально значимого слова &quot;Отблагорадить&quot;</span>
+                    <span class="s0">deleteMessage</span><span class="s1">(</span><span class="s3">this</span><span class="s1">, </span><span class="s0">userChatId</span><span class="s1">, </span><span class="s0">update</span><span class="s1">.</span><span class="s0">message</span><span class="s1">.</span><span class="s0">messageId</span><span class="s1">, </span><span class="s0">delay </span><span class="s1">= </span><span class="s5">5000</span><span class="s1">)</span>
+                <span class="s1">}</span>
+
+                <span class="s4">&quot;/readDb&quot; </span><span class="s1">-&gt; {</span>
+                    <span class="s0">dbQuiziHelper</span><span class="s1">.</span><span class="s0">readUsersFromQuiziDb</span><span class="s1">()</span>
+                <span class="s1">}</span>
+
+                <span class="s4">&quot;/disDb&quot; </span><span class="s1">-&gt; {</span>
+                    <span class="s0">dbQuiziHelper</span><span class="s1">.</span><span class="s0">disconnectFromQuiziDb</span><span class="s1">()</span>
+                <span class="s1">}</span>
+
+
+<span class="s6">/***                           protectContent работает только на отправляемый файл, на ЧАТ НЕ ВЛИЯЕТ              ***/</span>
+                <span class="s4">&quot;test0&quot; </span><span class="s1">-&gt; {</span>
+                    <span class="s0">sendPhoto</span><span class="s1">(</span>
+                        <span class="s3">this</span><span class="s1">,</span>
+                        <span class="s0">userChatId</span><span class="s1">,</span>
+                        <span class="s0">photoFile </span><span class="s1">= </span><span class="s0">java</span><span class="s1">.</span><span class="s0">io</span><span class="s1">.</span><span class="s0">File</span><span class="s1">(</span><span class="s4">&quot;src/main/resources/Img/memCat1.png&quot;</span><span class="s1">),</span>
+                        <span class="s0">protectContent </span><span class="s1">= </span><span class="s3">true</span>
+                    <span class="s1">)</span>
+
+                    <span class="s0">Timer</span><span class="s1">().</span><span class="s0">schedule</span><span class="s1">(</span><span class="s5">5000</span><span class="s1">) {</span>
+                        <span class="s0">sendPhoto</span><span class="s1">(</span>
+                            <span class="s0">bot </span><span class="s1">= </span><span class="s3">this</span><span class="s0">@Bot</span><span class="s1">,</span>
+                            <span class="s0">userChatId</span><span class="s1">,</span>
+                            <span class="s0">photoFile </span><span class="s1">= </span><span class="s0">java</span><span class="s1">.</span><span class="s0">io</span><span class="s1">.</span><span class="s0">File</span><span class="s1">(</span><span class="s4">&quot;src/main/resources/Img/memCat2.png&quot;</span><span class="s1">),</span>
+                            <span class="s0">protectContent </span><span class="s1">= </span><span class="s3">false</span>
+                        <span class="s1">)</span>
+                    <span class="s1">}</span>
+                <span class="s1">}</span>
+
+                <span class="s3">else </span><span class="s1">-&gt; {</span>
+
+<span class="s2">//                    val name = update.message.text.split(&quot; &quot;)[0]</span>
+<span class="s2">//                    val age = update.message.text.split(&quot; &quot;)[1].toInt()</span>
+<span class="s2">//                    databaseHelper.insertUserToDb(name, age)</span>
+
+                    <span class="s2">// TODO: (Случай непредвиденного жмяка)</span>
+                <span class="s1">}</span>
+            <span class="s1">}</span>
+        <span class="s1">} </span><span class="s3">else if </span><span class="s1">(</span><span class="s0">update</span><span class="s1">.</span><span class="s0">hasCallbackQuery</span><span class="s1">()) {</span>
+            <span class="s2">// TODO:(Обработка ответов на тесты)</span>
+        <span class="s1">}</span>
+    <span class="s1">}</span>
+<span class="s1">}</span>
+
+
+</pre>
+</body>
+</html>
