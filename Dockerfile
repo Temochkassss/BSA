@@ -1,11 +1,21 @@
-# Используем базовый образ с Java
-FROM openjdk:21-jdk-slim
+# Сборка JAR
+FROM maven:3.8.6-openjdk-11 AS builder
 
-# Устанавливаем рабочую директорию
 WORKDIR /app
+COPY pom.xml .
+# Копируем исходники
+COPY src ./src
+# Собираем проект (JAR появится в /app/target/)
+RUN mvn clean package -DskipTests
 
-# Копируем JAR-файл в контейнер
-COPY target/QuizBot-1.0-SNAPSHOT.jar /app/QuizBot-1.0-SNAPSHOT.jar
+# Финальный образ
+FROM openjdk:11-jre-slim
 
-# Команда для запуска приложения
-CMD ["java", "-jar", "QuizBot-1.0-SNAPSHOT.jar"]
+WORKDIR /app
+# Копируем JAR из стадии сборки
+COPY --from=builder /app/target/QuizBot-1.0-SNAPSHOT.jar ./bot.jar
+# Если SQLite хранит данные в файле, создаем директорию и разрешаем запись
+RUN mkdir -p /app/data && chmod a+rw /app/data
+
+# Запуск приложения
+CMD ["java", "-jar", "bot.jar"]
