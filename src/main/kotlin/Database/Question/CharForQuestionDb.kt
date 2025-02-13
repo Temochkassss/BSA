@@ -20,7 +20,7 @@ object CharForQuestionDb {
     const val COLUMN_NAME_TAGRET_NUMBER_OF_ATTEMPTS = "target_number_of_attempts"
 
     const val DATABASE_VERSION = 4
-    const val DATABASE_NAME = "C:\\Users\\priia\\Downloads\\SpringDemoBot0Java\\QuizBot\\question.db"
+    const val DATABASE_NAME = "C:\\Users\\priia\\Downloads\\SpringDemoBot0Java\\QuizBot\\src\\main\\kotlin\\Database\\questionDb.csv"
 
     const val CREATE_TABLE = """
         CREATE TABLE IF NOT EXISTS $TABLE_NAME (

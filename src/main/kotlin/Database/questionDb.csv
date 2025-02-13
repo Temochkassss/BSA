@@ -1,0 +1,24 @@
+--
+-- Файл сгенерирован с помощью SQLiteStudio v3.4.4 в Чт фев 13 22:30:41 2025
+--
+-- Использованная кодировка текста: System
+--
+PRAGMA foreign_keys = off;
+BEGIN TRANSACTION;
+
+-- Таблица: resultsTestTable
+CREATE TABLE IF NOT EXISTS resultsTestTable (
+    author_chat_id  LONG,
+    user_chat_id    LONG,
+    author_username TEXT    DEFAULT SYSTEM,
+    user_username   TEXT,
+    test_name       TEXT,
+    author_test_id  TEXT,
+    result_test_id  TEXT,
+    choosed_index   INTEGER,
+    data            LONG
+);
+
+
+COMMIT TRANSACTION;
+PRAGMA foreign_keys = on;
