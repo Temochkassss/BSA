@@ -30,6 +30,17 @@ class DatabaseQuiziHelper(
     // чтобы не использовать var connection: Connection? = null и работать с nullable переменной
     private lateinit var connection: Connection // откладываем инициализацию переменной до её первого использования (late init - поздняя  инициализация)
 
+
+    fun connect() {
+        if (connection?.isClosed != false) {
+            connection = DriverManager.getConnection("jdbc:sqlite:$dbName")
+        }
+    }
+
+    fun disconnect() {
+        connection?.close()
+    }
+
     fun connectToQuziDb() {
         try {
             val url = "jdbc:sqlite:$dbName" // местоположение файла базы данных SQLite

@@ -27,9 +27,9 @@ object CharForQuiziDb { // назначаем константы - назван�
             "$COLUMN_NAME_USER TEXT," +
             "$COLUMN_NAME_LANGUAGE TEXT," +
             "$COLUMN_NAME_IS_PREMIUM BOOLEAN," +
-            "$COLUMN_NAME_IS_BOT BOOLEAN" +
-            "$COLUMN_NAME_ARRAY_OF_TEST_ID TEXT" +
-            "$COLUMN_NAME_ARRAY_OF_RESULTS_ID TEXT" +
+            "$COLUMN_NAME_IS_BOT BOOLEAN," +
+            "$COLUMN_NAME_ARRAY_OF_TEST_ID TEXT," +
+            "$COLUMN_NAME_ARRAY_OF_RESULTS_ID TEXT," +
             "$COLUMN_NAME_RATING INTEGER" +
             ")"
 
@@ -39,7 +39,7 @@ object CharForQuiziDb { // назначаем константы - назван�
             " $COLUMN_NAME_USERNAME," +
             " $COLUMN_NAME_USER," +
             " $COLUMN_NAME_LANGUAGE," +
-            " $COLUMN_NAME_LANGUAGE," +
+            " $COLUMN_NAME_IS_PREMIUM," +
             " $COLUMN_NAME_IS_BOT," +
             " $COLUMN_NAME_ARRAY_OF_TEST_ID," +
             " $COLUMN_NAME_ARRAY_OF_RESULTS_ID," +
