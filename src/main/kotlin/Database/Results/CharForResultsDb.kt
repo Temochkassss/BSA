@@ -16,7 +16,7 @@ object CharForResultsDb {
     const val CN_DATA = "data"
 
     const val DATABASE_VERSION = 1
-    const val DATABASE_NAME = "results.db"
+    const val DATABASE_NAME = "C:\\Users\\priia\\Downloads\\SpringDemoBot0Java\\QuizBot\\results.db"
 
     const val CREATE_TABLE = """
         CREATE TABLE IF NOT EXISTS $TABLE_NAME (
