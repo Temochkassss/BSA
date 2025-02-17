@@ -18,7 +18,7 @@ object CharForQuiziDb { // назначаем константы - назван�
     const val COLUMN_NAME_RATING = "rating"
 
     const val DATABASE_VERSION = 7
-    const val DATABASE_NAME = "C:\\Users\\priia\\Downloads\\SpringDemoBot0Java\\QuizBot\\quizi.db"
+    const val DATABASE_NAME = "C:\\Users\\priia\\Downloads\\SpringDemoBot0Java\\QuizBot\\data\\quizi.db"
 
     const val CREATE_TABLE = "CREATE TABLE IF NOT EXISTS $TABLE_NAME (" +
             "$COLLUMN_NAME_ID INTEGER PRIMARY KEY," +

@@ -107,8 +107,7 @@ class DatabaseQuestionHelper(
         val imageUrl = resultSet.getString(CharForQuestionDb.COLUMN_NAME_IMAGE_URL)
         return Question(id, testID, question, arrayOfAnswers, indexOfRightAnswer, completionPercent, testName, imageUrl, numUpdate) // объект с полученными значениями
     }
-
-    fun readQuestionFromQuestionDb(testId: String? = null) : List<Question> {
+   fun readQuestionFromQuestionDb(testId: String? = null) : List<Question> {
         val questions = mutableListOf<Question>() // пустой изменяемый список
         connectToQuestionDb()
 
