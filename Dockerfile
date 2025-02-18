@@ -14,6 +14,5 @@ COPY --from=builder /app/target/QuizBot-1.0-SNAPSHOT.jar ./bot.jar
 
 # Создаем папку data и копируем базу данных
 RUN mkdir -p /app/data && chmod a+rw /app/data
-COPY data/database.db /app/data/database.db  # Копируем базу данных в папку data
 
 CMD ["java", "-jar", "bot.jar"]
