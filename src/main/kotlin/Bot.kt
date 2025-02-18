@@ -64,25 +64,35 @@ class Bot: TelegramLongPollingBot("7110164125:AAFTEP0jd9-peZJDWU6hkQ7v_7qMSZWh7Z
 
     // Функция, которая обрабатывает запрос на предварительную проверку оплаты
     private fun handlePreCheckoutQuery(preCheckoutQuery: PreCheckoutQuery) {
+        val startTime = System.currentTimeMillis()
         try {
-            println("PreCheckoutQuery received: ${preCheckoutQuery.id}")
-            println("Invoice payload: ${preCheckoutQuery.invoicePayload}")
-            println("Total amount: ${preCheckoutQuery.totalAmount}")
+            // Логирование для отладки
+            println("[${startTime}] Начало обработки PreCheckoutQuery...")
+            println("[DEBUG] PreCheckoutQuery received: ${preCheckoutQuery.id}")
 
-            // Отправляем ответ сразу, чтобы избежать тайм-аута
-            execute(AnswerPreCheckoutQuery.builder()
-                .preCheckoutQueryId(preCheckoutQuery.id)
-                .ok(true)
-                .build())
+            // Немедленный ответ!
+            execute(
+                AnswerPreCheckoutQuery.builder()
+                    .preCheckoutQueryId(preCheckoutQuery.id)
+                    .ok(true)
+                    .build()
+            )
 
+            val duration = System.currentTimeMillis() - startTime
+            println("[DEBUG] Ответ отправлен за ${duration}ms")
+            println("[DEBUG] Ответ на PreCheckoutQuery отправлен успешно.")
         } catch (e: Exception) {
-            println("PreCheckout error: ${e.message}")
+            println("[ERROR] Ошибка при обработке PreCheckoutQuery: ${e.message}")
             e.printStackTrace()
-            execute(AnswerPreCheckoutQuery.builder()
-                .preCheckoutQueryId(preCheckoutQuery.id)
-                .ok(false)
-                .errorMessage("Ошибка обработки платежа: ${e.message}")
-                .build())
+
+            // Попытка отправить ошибку, если основной ответ не прошел
+            execute(
+                AnswerPreCheckoutQuery.builder()
+                    .preCheckoutQueryId(preCheckoutQuery.id)
+                    .ok(false)
+                    .errorMessage("Ошибка: ${e.message?.take(200)}") // Ограничение длины сообщения
+                    .build()
+            )
         }
     }
 
