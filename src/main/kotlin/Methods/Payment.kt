@@ -4,7 +4,6 @@ import Methods.TextSender.clearPreviousMessages
 import Methods.TextSender.editMessage
 import Methods.TextSender.sendMessage
 import StringForBot
-import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import org.telegram.telegrambots.bots.TelegramLongPollingBot
 import org.telegram.telegrambots.meta.api.methods.ParseMode

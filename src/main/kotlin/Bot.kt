@@ -20,7 +20,6 @@ import org.telegram.telegrambots.meta.api.objects.Update
 import org.telegram.telegrambots.meta.api.objects.User
 import org.telegram.telegrambots.meta.api.objects.payments.PreCheckoutQuery
 import java.io.File
-import java.util.concurrent.CompletableFuture
 
 /**
  * Основной класс бота, обрабатывающий все входящие сообщения и взаимодействия
