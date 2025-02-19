@@ -20,7 +20,7 @@ object CharForQuestionDb {
     const val COLUMN_NAME_TAGRET_NUMBER_OF_ATTEMPTS = "target_number_of_attempts"
 
     const val DATABASE_VERSION = 4
-    const val DATABASE_NAME = "/app/data/question.db"
+    const val DATABASE_NAME = "/data/question.db"
 
     const val CREATE_TABLE = """
         CREATE TABLE IF NOT EXISTS $TABLE_NAME (
