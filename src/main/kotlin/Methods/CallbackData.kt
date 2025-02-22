@@ -229,8 +229,8 @@ object CallbackData {
                 "createTestOnly" -> handleCreateTestOnly(bot, chatId)
                 "startMyOwnTest" -> handleStartMyOwnTest(bot, chatId)
                 "enterManualName" -> handleEnterManualName(bot, chatId)
-                "donateSomeSum" -> Payment.сhooseSum(bot, chatId)
-                "donateСustomSum" -> Payment.donateСustomPrice(bot, chatId)
+//                "donateSomeSum" -> Payment.сhooseSum(bot, chatId)
+//                "donateСustomSum" -> Payment.donateСustomPrice(bot, chatId)
                 else -> handleKeyboardPollAnswer(bot, chatId, callbackQuery)
             }
 
@@ -737,7 +737,7 @@ object CallbackData {
                 handleAgreeOrDisAgreeDeleteTest(bot, chatId, data)
             }
             data.startsWith("donateSum_") -> {
-                Payment.donateSetSum(bot, chatId, data)
+//                Payment.donateSetSum(bot, chatId, data)
             }
             data.startsWith("publicTestId_") -> {
                 handleStartPublicTest(bot, chatId, data)

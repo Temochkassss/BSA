@@ -310,7 +310,7 @@ object MessageRecieved {
         if (price != null && price > 0) {
             if (price >= 60) {
                 // Установка корректной суммы в invoice
-                Payment.donateSetSum(bot, chatId, price.toString())
+//                Payment.donateSetSum(bot, chatId, price.toString())
                 // Предотвращаем запуски иных состояний
                 userState.pollCreationState = null
             } else {

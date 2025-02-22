@@ -1,157 +1,91 @@
 package Methods
-
-import Methods.TextSender.clearPreviousMessages
-import Methods.TextSender.editMessage
 import Methods.TextSender.sendMessage
-import StringForBot
-import com.google.gson.GsonBuilder
+import io.ktor.client.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import io.ktor.util.*
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import java.util.*
+import kotlinx.coroutines.runBlocking
 import org.telegram.telegrambots.bots.TelegramLongPollingBot
-import org.telegram.telegrambots.meta.api.methods.ParseMode
-import org.telegram.telegrambots.meta.api.methods.invoices.SendInvoice
-import org.telegram.telegrambots.meta.api.objects.payments.LabeledPrice
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException
-import java.time.ZoneId
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
 
-
+@OptIn(InternalAPI::class)
 object Payment {
     const val YOOKASSA_SHOP_ID = "1019095"
     const val YOOKASSA_SECRET_KEY = "live_CjlL6CRpKzjajEHVOV5-fVKiZh3Csp0ohM0luJMIfq8"
-    const val PROVIDER_TOKEN = "381764678:TEST:109230"
+    const val PROVIDER_TOKEN = "390540012:LIVE:64209"
     const val CURRENCY = "RUB"
     private const val DESCRIPTION = "Пожертвование на развитие этой малышки \uD83E\uDD18"
 
-    fun сhooseSum(bot: TelegramLongPollingBot, chatId: Long) {
-        val userState = CallbackData.userStates.getOrPut(chatId) { CallbackData.UserState() }
-
-        // Редактируем сообщение с новым содержанием и inline-клавиатурой
-        editMessage(
-            bot,
-            chatId,
-            userState.donateMID,
-            "<b>Предлагаемые суммы:</b>",
-            inlineKeyboard = StringForBot.chooseSumIK(),
-            parseMode = ParseMode.HTML
-        )
-
+    fun handleDonationCommand(bot: TelegramLongPollingBot, chatId: Long) {
+        runBlocking {
+            val paymentUrl = createYooKassaPayment(100.0, "RUB", "Пожертвование", "https://t.me/and_she_will_ask_bot")
+            sendMessage(bot, chatId, "Оплатите по ссылке: $paymentUrl")
+        }
     }
 
-    fun donateСustomPrice(bot: TelegramLongPollingBot, chatId: Long) {
-        val userState = CallbackData.userStates.getOrPut(chatId) { CallbackData.UserState() }
-
-        // Очистка предыдущих сообщений
-        clearPreviousMessages(userState, bot, chatId, userState.somethingElseMID)
-
-        // Отправляем сообщение с новым содержанием
-        editMessage(
-            bot,
-            chatId,
-            userState.donateMID,
-            "<b>Введите сумму ниже:</b>",
-            parseMode = ParseMode.HTML
+    @Serializable
+    data class YooKassaPaymentRequest(
+        val amount: Amount,
+        val capture: Boolean = true,
+        val confirmation: Confirmation,
+        val description: String
+    ) {
+        @Serializable
+        data class Amount(
+            val value: String,
+            val currency: String
         )
 
-        userState.pollCreationState = CallbackData.PollCreationState.WaitingCustomDonationSum()
+        @Serializable
+        data class Confirmation(
+            val type: String = "redirect",
+            val return_url: String
+        )
+
+        @Serializable
+        enum class ConfirmationType {
+            REDIRECT,
+            EXTERNAL,
+            EMBEDDED
+        }
     }
 
-    // Функция, которая обрабатывает платежи для Telegram-бота
-    fun donateSetSum(bot: TelegramLongPollingBot, chatId: Long, dataSum: String) {
-        val userState = CallbackData.userStates.getOrPut(chatId) { CallbackData.UserState() }
-        val donationAmount = dataSum.removePrefix("donateSum_").toInt()
+    suspend fun createYooKassaPayment(amount: Double, currency: String, description: String, returnUrl: String): String {
+        val client = HttpClient()
 
-        clearPreviousMessages(userState, bot, chatId, userState.donateMID, userState.somethingElseMID)
-        userState.donationSum = donationAmount * 100
+        val paymentRequest = YooKassaPaymentRequest(
+            amount = YooKassaPaymentRequest.Amount(
+                value = amount.toString(),
+                currency = currency
+            ),
+            confirmation = YooKassaPaymentRequest.Confirmation(
+                type = "redirect",
+                return_url = returnUrl
+            ),
+            description = description
+        )
 
-        val invoice = SendInvoice.builder()
-            .chatId(chatId)
-            .title("Поддержка проекта")
-            .description(DESCRIPTION)
-            .payload("payment-$chatId-${System.currentTimeMillis()}") // Уникальный идентификатор
-            .providerToken(PROVIDER_TOKEN) // Используем корректный токен авторизации
-            .currency(CURRENCY)
-            .prices(listOf(LabeledPrice("Поддержка проекта \uD83C\uDF81", userState.donationSum)))
-            .photoUrl("https://i.postimg.cc/G2jtqjg7/photo-2025-01-25-18-03-09.jpg")
-            .photoSize(400)
-            .photoHeight(400)
-            .photoWidth(400)
-            .providerData(createProviderData(chatId))
-            .startParameter("donate_${System.currentTimeMillis()}")
-            .needEmail(true)
-            .needShippingAddress(false) // Отключаем запрос адреса, если не требуется
-            .isFlexible(false) // Фиксированная стоимость
-            .build()
 
-        try {
-            bot.execute(invoice)
-        } catch (e: TelegramApiException) {
-            println("Error sending invoice: ${e.message}")
-            sendMessage(bot, chatId, "Ошибка при создании платежа. Попробуйте позже.")
+        val json = Json { ignoreUnknownKeys = true } // Настройте Json по необходимости
+        val jsonBody = json.encodeToString(paymentRequest)
+
+        val response: HttpResponse = client.post("https://api.yookassa.ru/v3/payments?test=true") {
+            headers {
+                append(HttpHeaders.Authorization, "Basic ${"$YOOKASSA_SHOP_ID:$YOOKASSA_SECRET_KEY".encodeBase64()}")
+                append(HttpHeaders.ContentType, "application/json")
+                header("Idempotence-Key", System.currentTimeMillis().toString())
+            }
+            body = jsonBody
         }
 
-        Generation.somethingElseKeyboardGeneration(bot, chatId, userState)
+        return response.bodyAsText()
     }
 
-//    private fun createProviderData(chatId: Long): String {
-//        val userState = CallbackData.userStates.getOrPut(chatId){ CallbackData.UserState()}
-//        val gson = Gson()
-//        val receiptData = mapOf(
-//            "receipt" to mapOf(
-//                "items" to listOf(
-//                    mapOf(
-//                        "description" to "Описание товара",
-//                        "quantity" to "1.00",
-//                        "amount" to mapOf(
-//                            "value" to (userState.donationSum / 100.0).toString(),
-//                            "currency" to CURRENCY
-//                        ),
-//                        "vat_code" to 1
-//                    )
-//                )
-//            )
-//        )
-//        return gson.toJson(receiptData)
-//    }
-
-
-    private fun createProviderData(chatId: Long): String {
-        val userState = CallbackData.userStates[chatId] ?: return "{}"
-        val gson = GsonBuilder().disableHtmlEscaping().create()
-
-        val now = ZonedDateTime.now(ZoneId.of("Europe/Moscow"))
-        val documentDate = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"))
-        println("documentDate = $documentDate")
-
-        val receipt = mapOf(
-//            "customer" to mapOf( // Добавить информацию о покупателе
-//                "email" to "example@example.com"  // Обязательное поле
-//            ),
-            "items" to listOf(
-                mapOf(
-                    "description" to DESCRIPTION,
-                    "quantity" to "1.00",
-                    "amount" to mapOf(
-                        "value" to (userState.donationSum / 100.0).toString(),
-                        "currency" to CURRENCY
-                    ),
-                    "vat_code" to "1",
-                    "payment_object" to "service",
-                    "payment_mode" to "full_prepayment"
-                )
-            ),
-            "tax_system_code" to "1",
-//            "receipt_industry_details" to listOf( // Добавить детали чека
-//                mapOf(
-//                    "federal_id" to "001",
-//                    "document_date" to documentDate,
-//                    "document_number" to "123",
-//                    "value" to "1"
-//                )
-//            )
-        )
-
-        return gson.toJson(mapOf("receipt" to receipt))
+    fun String.encodeBase64(): String {
+        return Base64.getEncoder().encodeToString(this.toByteArray())
     }
-
-
 }

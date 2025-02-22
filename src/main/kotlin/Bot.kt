@@ -19,6 +19,7 @@ import org.telegram.telegrambots.meta.api.objects.Message
 import org.telegram.telegrambots.meta.api.objects.Update
 import org.telegram.telegrambots.meta.api.objects.User
 import org.telegram.telegrambots.meta.api.objects.payments.PreCheckoutQuery
+import org.telegram.telegrambots.meta.api.objects.payments.SuccessfulPayment
 import java.io.File
 
 /**
@@ -38,11 +39,12 @@ class Bot: TelegramLongPollingBot("7110164125:AAFTEP0jd9-peZJDWU6hkQ7v_7qMSZWh7Z
         try {
             when {
                 update.hasPreCheckoutQuery() -> {
-                    handlePreCheckoutQuery(update.preCheckoutQuery)
+//                    Payment.handlePreCheckoutQuery(this, update.preCheckoutQuery)
                 }
+
                 update.hasMessage() -> {
                     if (update.message.hasSuccessfulPayment()) {
-                        handleSuccessfulPayment(update.message)
+//                        Payment.handleSuccessfulPayment(this, update.message)
                     } else if (update.message.hasText()) {
                         handleTextMessage(update, dbQuiziHelper, dbQuestionHelper, dbResultsHelper)
                     } else if (update.message.hasPhoto()) { // Добавьте проверку на фото
@@ -62,66 +64,12 @@ class Bot: TelegramLongPollingBot("7110164125:AAFTEP0jd9-peZJDWU6hkQ7v_7qMSZWh7Z
         }
     }
 
-    // Функция, которая обрабатывает запрос на предварительную проверку оплаты
-    private fun handlePreCheckoutQuery(preCheckoutQuery: PreCheckoutQuery) {
-        val startTime = System.currentTimeMillis()
-        try {
-            // Логирование для отладки
-            println("[${startTime}] Начало обработки PreCheckoutQuery...")
-            println("[DEBUG] PreCheckoutQuery received: ${preCheckoutQuery.id}")
-
-            // Немедленный ответ!
-            execute(
-                AnswerPreCheckoutQuery.builder()
-                    .preCheckoutQueryId(preCheckoutQuery.id)
-                    .ok(true)
-                    .build()
-            )
-
-            val duration = System.currentTimeMillis() - startTime
-            println("[DEBUG] Ответ отправлен за ${duration}ms")
-            println("[DEBUG] Ответ на PreCheckoutQuery отправлен успешно.")
-        } catch (e: Exception) {
-            println("[ERROR] Ошибка при обработке PreCheckoutQuery: ${e.message}")
-            e.printStackTrace()
-
-            // Попытка отправить ошибку, если основной ответ не прошел
-            execute(
-                AnswerPreCheckoutQuery.builder()
-                    .preCheckoutQueryId(preCheckoutQuery.id)
-                    .ok(false)
-                    .errorMessage("Ошибка: ${e.message?.take(200)}") // Ограничение длины сообщения
-                    .build()
-            )
-        }
+    private fun savePaymentInfo(payment: SuccessfulPayment) {
+        // Реализация сохранения информации о платеже в базу данных
     }
 
-
-    // Функция, которая обрабатывает успешный платеж
-    private fun handleSuccessfulPayment(message: Message) {
-        val chatId = message.chatId
-        val userState = userStates.getOrPut(chatId) { CallbackData.UserState() }
-
-        try {
-            // Запись в лог
-            println("Successful payment: ${message.successfulPayment}")
-
-            // Отправка подтверждения
-            userState.successfulPaymentMID = sendMessage(
-                this,
-                chatId,
-                "✅ Платёж успешно проведен! Спасибо за поддержку!"
-            )?.messageId ?: 0
-
-            // Дополнительные действия после успешного платежа
-            Animation.successfulDonate(this, chatId, userState)
-
-            // Здесь можно добавить логику предоставления доступа к премиум функциям
-
-        } catch (e: Exception) {
-            println("Payment processing error: ${e.message}")
-            sendMessage(this, chatId, "⚠️ Ошибка обработки платежа. Свяжитесь с поддержкой.")
-        }
+    private fun updateUserStatus(chatId: Long, payment: SuccessfulPayment) {
+        // Обновление статуса пользователя после успешного платежа
     }
 
     private fun handlePhotoMessage(update: Update, dbQuestionHelper: DatabaseQuestionHelper) {
@@ -187,6 +135,8 @@ class Bot: TelegramLongPollingBot("7110164125:AAFTEP0jd9-peZJDWU6hkQ7v_7qMSZWh7Z
             "/disDb" -> handleDisconnectDb(dbQuiziHelper, dbQuestionHelper)
 
             "Лере быстро" -> forLoveAyh()
+
+//            "Оплата" -> Payment.handleDonationCommand(this, chatId)
 
             else -> {
                 if (messageText.startsWith("/start")) {

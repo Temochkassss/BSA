@@ -75,7 +75,7 @@ object StringForBot {
             },
             KeyboardRow().apply {
                 add(KeyboardButton("Оценить \u2B50"))             // ⭐ (звезда)
-                add(KeyboardButton("Отблагодарить \uD83D\uDCB8")) // 💸 (деньги)
+//                add(KeyboardButton("Отблагодарить \uD83D\uDCB8")) // 💸 (деньги)
             },
         )
         resizeKeyboard = true
