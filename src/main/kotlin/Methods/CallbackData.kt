@@ -736,9 +736,9 @@ object CallbackData {
             data.startsWith("deleting_") -> {
                 handleAgreeOrDisAgreeDeleteTest(bot, chatId, data)
             }
-            data.startsWith("donateSum_") -> {
-//                Payment.donateSetSum(bot, chatId, data)
-            }
+//            data.startsWith("donateSum_") -> {
+////                Payment.donateSetSum(bot, chatId, data)
+//            }
             data.startsWith("publicTestId_") -> {
                 handleStartPublicTest(bot, chatId, data)
             }
