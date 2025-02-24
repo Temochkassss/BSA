@@ -639,7 +639,7 @@ object StringForBot {
             return "❌ Ошибка загрузки информации: результат не найден."
         }
         if (authorName.isBlank() || userName.isBlank()) {
-            authorName = "@SomeAuthor"
+            authorName = "SomeAuthor"
             userName = reserveUsername ?: "Анонимный пользователь"
         }
 
