@@ -995,8 +995,11 @@ object CallbackData {
     private fun handleShowResults(bot: TelegramLongPollingBot, chatId: Long, resultId: String) {
         val userState = userStates.getOrPut(chatId) { UserState() }
 
+        // Получение username проходившего
+        userState.username = dbQuiziHelper.readUsernameByChatId(chatId)
+
         // Получение параметров для показа результатов теста
-        val message = StringForBot.seeResultParametr(resultId)
+        val message = StringForBot.seeResultParametr(resultId, userState.username)
 
         // Создаем кнопку для возврата к списку результатов
         val backButton = InlineKeyboardMarkup(

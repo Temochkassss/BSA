@@ -626,21 +626,21 @@ object StringForBot {
     }
 
     /** Функция показа результатов **/
-    fun seeResultParametr(resultId: String): String {
+    fun seeResultParametr(resultId: String, reserveUsername: String? = "Анонимный пользователь"): String {
         // Получаем информацию о результате
-        val (authorTestId, timestamp) = CallbackData.dbResultsHelper.getResultInfo(resultId) ?: run {
+        val (authorTestId, timestamp) = dbResultsHelper.getResultInfo(resultId) ?: run {
             return "❌ Ошибка загрузки результатов: результат не найден."
         }
 
         // Получаем основные данные
         val testName = dbQuestionHelper.readTestName(authorTestId) ?: "Неизвестный тест"
 
-        var (authorName, userName) = CallbackData.dbResultsHelper.getPersonInfo(resultId) ?: run {
+        var (authorName, userName) = dbResultsHelper.getPersonInfo(resultId) ?: run {
             return "❌ Ошибка загрузки информации: результат не найден."
         }
         if (authorName.isBlank() || userName.isBlank()) {
-            authorName = "Неизвестный автор"
-            userName = "Анонимный пользователь"
+            authorName = "@SomeAuthor"
+            userName = reserveUsername ?: "Анонимный пользователь"
         }
 
         // Форматирование времени
